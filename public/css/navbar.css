@@ -1,0 +1,46 @@
+/* Fondo transparente y sombra sutil */
+.navbar {
+    background-color: transparent !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1) !important;
+    padding: 0.75rem 1rem !important;  /* Un poco más pequeño para un efecto más minimalista */
+}
+
+/* Color de la marca (Biblioteca) */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.7rem;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* Cambio de color en hover de la marca */
+.navbar-brand:hover {
+    color: #007bff;
+}
+
+/* Estilo de los enlaces de navegación */
+.navbar-nav .nav-link {
+    font-size: 1rem;
+    color: #555;
+    margin: 0 0.75rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Efecto al pasar el ratón sobre los enlaces */
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* Botón de menú hamburguesa */
+.navbar-toggler-icon {
+    background-color: #007bff;
+}
+
+/* Ajustar la visibilidad de la barra en pantallas pequeñas */
+@media (max-width: 767px) {
+    .navbar-collapse {
+        background-color: rgba(255, 255, 255, 0.95); /* Fondo semi-transparente para los menús */
+    }
+}
