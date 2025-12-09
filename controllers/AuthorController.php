@@ -1,86 +1,113 @@
 <?php
-require_once '../models/AuthorModel.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-class AuthorController {
-    private $model;
+require_once '../models/AutorModel.php';
+
+class AutorController {
+    private $modelo;
 
     public function __construct() {
-        $this->model = new AuthorModel(); // Instancia el modelo de autor
+        $this->modelo = new AutorModel();
     }
 
-    // Acción para listar todos los autores
+    // Acción para listar autores
     public function index() {
-        $authors = $this->model->getAllAuthors(); // Obtener todos los autores
-        require_once '../views/authors/index.php'; // Cargar la vista del listado
-    }
-
-    // Acción para crear un nuevo autor
-    public function create() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Obtener datos del formulario
-            $fullName = $_POST['fullName'];
-            $birthDate = $_POST['birthDate'];
-            $deathDate = $_POST['deathDate'] ?? null;
-
-            // Agregar autor en la base de datos
-            $this->model->addAuthor($fullName, $birthDate, $deathDate);
-
-            // Redirigir al listado
-            header('Location: index.php?controller=author&action=index');
-            exit();
-        } else {
-            // Cargar la vista del formulario de creación
-            require_once '../views/authors/create.php';
+        try {
+            $autores = $this->modelo->obtenerAutores();
+            require_once '../views/autores/index.php';
+        } catch (Exception $e) {
+            $this->setFlashMessage('error', 'Error al cargar autores: ' . $e->getMessage());
+            require_once '../views/autores/index.php';
         }
     }
 
-    // Acción para editar un autor existente
+    // Acción para crear
+    public function create() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nombre = trim($_POST['nombre'] ?? '');
+            $fechaNacimiento = $_POST['fechaNacimiento'] ?? '';
+            $fechaFallecimiento = !empty($_POST['fechaFallecimiento']) ? $_POST['fechaFallecimiento'] : null;
+
+            if (empty($nombre) || empty($fechaNacimiento)) {
+                $this->setFlashMessage('warning', 'El nombre y la fecha de nacimiento son obligatorios.');
+                require_once '../views/autores/create.php';
+                return;
+            }
+
+            try {
+                $this->modelo->agregarAutor($nombre, $fechaNacimiento, $fechaFallecimiento);
+                $this->setFlashMessage('success', 'Autor registrado correctamente.');
+                header('Location: index.php?controller=autor&action=index');
+                exit();
+            } catch (Exception $e) {
+                $this->setFlashMessage('error', 'Error al guardar: ' . $e->getMessage());
+                require_once '../views/autores/create.php';
+            }
+        } else {
+            require_once '../views/autores/create.php';
+        }
+    }
+
+    // Acción para editar
     public function edit() {
         $id = $_GET['id'] ?? null;
 
-        if ($id === null) {
-            // Si no hay ID, redirigir al listado
-            header('Location: index.php?controller=author&action=index');
+        if (!$id) {
+            $this->setFlashMessage('error', 'ID de autor no especificado.');
+            header('Location: index.php?controller=autor&action=index');
             exit();
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Obtener datos del formulario
-            $fullName = $_POST['fullName'];
-            $birthDate = $_POST['birthDate'];
-            $deathDate = $_POST['deathDate'] ?? null;
+            $nombre = trim($_POST['nombre']);
+            $fechaNacimiento = $_POST['fechaNacimiento'];
+            $fechaFallecimiento = !empty($_POST['fechaFallecimiento']) ? $_POST['fechaFallecimiento'] : null;
 
-            // Actualizar autor en la base de datos
-            $this->model->updateAuthor($id, $fullName, $birthDate, $deathDate);
-
-            // Redirigir al listado
-            header('Location: index.php?controller=author&action=index');
-            exit();
+            try {
+                $this->modelo->actualizarAutor($id, $nombre, $fechaNacimiento, $fechaFallecimiento);
+                $this->setFlashMessage('success', 'Autor actualizado correctamente.');
+                header('Location: index.php?controller=autor&action=index');
+                exit();
+            } catch (Exception $e) {
+                $this->setFlashMessage('error', 'No se pudo actualizar: ' . $e->getMessage());
+                $autor = $this->modelo->obtenerAutorPorId($id); 
+                require_once '../views/autores/edit.php';
+            }
         } else {
-            // Obtener los datos del autor para editar
-            $author = $this->model->getAuthorById($id);
-
-            // Cargar la vista del formulario de edición
-            require_once '../views/authors/edit.php';
+            $autor = $this->modelo->obtenerAutorPorId($id);
+            if (!$autor) {
+                $this->setFlashMessage('error', 'El autor no existe.');
+                header('Location: index.php?controller=autor&action=index');
+                exit();
+            }
+            require_once '../views/autores/edit.php';
         }
     }
 
-    // Acción para eliminar un autor
+    // Acción para eliminar
     public function delete() {
         $id = $_GET['id'] ?? null;
 
-        if ($id === null) {
-            // Si no hay ID, redirigir al listado
-            header('Location: index.php?controller=author&action=index');
-            exit();
+        if ($id) {
+            try {
+                $this->modelo->eliminarAutor($id);
+                $this->setFlashMessage('success', 'Autor eliminado correctamente.');
+            } catch (Exception $e) {
+                $this->setFlashMessage('error', 'Error al eliminar: ' . $e->getMessage());
+            }
         }
 
-        // Eliminar el autor de la base de datos
-        $this->model->deleteAuthor($id);
-
-        // Redirigir al listado
-        header('Location: index.php?controller=author&action=index');
+        header('Location: index.php?controller=autor&action=index');
         exit();
+    }
+
+    private function setFlashMessage($tipo, $mensaje) {
+        $_SESSION['flash_message'] = [
+            'type' => $tipo, // 'success', 'error', 'warning'
+            'text' => $mensaje
+        ];
     }
 }
 ?>
