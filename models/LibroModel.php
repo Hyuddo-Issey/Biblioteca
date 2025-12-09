@@ -26,7 +26,6 @@ class LibroModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Obtener un libro por su ID para editarlo
     public function obtenerLibroPorId($id) {
         $query = "SELECT * FROM LIBRO WHERE ID_LIBRO = :id";
         $stmt = $this->db->prepare($query);
@@ -35,31 +34,23 @@ class LibroModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Agregar un nuevo libro
     public function agregarLibro($titulo, $descripcion, $anioPublicacion, $idAutor, $idGenero) {
         $query = "INSERT INTO LIBRO (TITULO, DESCRIPCION, ANIO_PUBLICACION, ID_AUTOR, ID_GENERO) 
                   VALUES (:titulo, :descripcion, :anio, :idAutor, :idGenero)";
-        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':titulo', $titulo);
         $stmt->bindParam(':descripcion', $descripcion);
         $stmt->bindParam(':anio', $anioPublicacion);
         $stmt->bindParam(':idAutor', $idAutor, PDO::PARAM_INT);
         $stmt->bindParam(':idGenero', $idGenero, PDO::PARAM_INT);
-        
         return $stmt->execute();
     }
 
-    // Actualizar un libro existente
     public function actualizarLibro($id, $titulo, $descripcion, $anioPublicacion, $idAutor, $idGenero) {
         $query = "UPDATE LIBRO 
-                  SET TITULO = :titulo, 
-                      DESCRIPCION = :descripcion, 
-                      ANIO_PUBLICACION = :anio, 
-                      ID_AUTOR = :idAutor, 
-                      ID_GENERO = :idGenero 
+                  SET TITULO = :titulo, DESCRIPCION = :descripcion, ANIO_PUBLICACION = :anio, 
+                      ID_AUTOR = :idAutor, ID_GENERO = :idGenero 
                   WHERE ID_LIBRO = :id";
-        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':titulo', $titulo);
@@ -67,27 +58,23 @@ class LibroModel {
         $stmt->bindParam(':anio', $anioPublicacion);
         $stmt->bindParam(':idAutor', $idAutor, PDO::PARAM_INT);
         $stmt->bindParam(':idGenero', $idGenero, PDO::PARAM_INT);
-        
         return $stmt->execute();
     }
 
-    // Eliminar libro con validación de seguridad
     public function eliminarLibro($id) {
+        // Validamos Stock antes de borrar
         $queryCheck = "SELECT COUNT(*) FROM INVENTARIO WHERE ID_LIBRO = :id";
         $stmtCheck = $this->db->prepare($queryCheck);
         $stmtCheck->bindParam(':id', $id, PDO::PARAM_INT);
         $stmtCheck->execute();
         
-        $cantidadEnInventario = $stmtCheck->fetchColumn();
-    
-        if ($cantidadEnInventario > 0) {
-            throw new Exception("No se puede eliminar: El libro existe en el inventario/stock.");
+        if ($stmtCheck->fetchColumn() > 0) {
+            throw new Exception("No se puede eliminar el libro: Tiene stock asociado.");
         }
     
         $query = "DELETE FROM LIBRO WHERE ID_LIBRO = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        
         return $stmt->execute();
     }
 }
