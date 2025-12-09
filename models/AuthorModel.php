@@ -37,7 +37,8 @@ class AutorModel {
         
         return $stmt->execute();
     }
-
+    
+    //Auctualizar a un autor ya existente
     public function actualizarAutor($id, $nombreCompleto, $fechaNacimiento, $fechaFallecimiento = null) {
         $query = "UPDATE AUTOR 
                   SET NOMBRE_COMPLETO = :nombre, 
@@ -53,7 +54,8 @@ class AutorModel {
         
         return $stmt->execute();
     }
-
+    
+    //Eliminar un autor
     public function eliminarAutor($id) {
         $query = "DELETE FROM AUTOR WHERE ID_AUTOR = :id";
         $stmt = $this->db->prepare($query);
