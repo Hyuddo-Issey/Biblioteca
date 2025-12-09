@@ -10,7 +10,6 @@ class InventarioModel
         $this->db = conectarDB();
     }
 
-    // Obtener todo el inventario con el título del libro asociado
     public function obtenerInventario()
     {
         $query = "
@@ -38,46 +37,36 @@ class InventarioModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Agregar nuevo stock
     public function agregarInventario($idLibro, $cantidad, $notas, $fecha = null)
     {
         if ($fecha === null) {
-            $fecha = date('Y-m-d'); 
+            $fecha = date('Y-m-d');
         }
 
         $query = "INSERT INTO INVENTARIO (ID_LIBRO, CANTIDAD_STOCK, NOTAS, FECHA_ULTIMO_INVENTARIO) 
                   VALUES (:idLibro, :cantidad, :notas, :fecha)";
-        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':idLibro', $idLibro, PDO::PARAM_INT);
         $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
         $stmt->bindParam(':notas', $notas);
         $stmt->bindParam(':fecha', $fecha);
-        
         return $stmt->execute();
     }
 
-    // Actualizar stock existente
     public function actualizarInventario($id, $idLibro, $cantidad, $notas, $fecha)
     {
         $query = "UPDATE INVENTARIO 
-                  SET ID_LIBRO = :idLibro, 
-                      CANTIDAD_STOCK = :cantidad, 
-                      NOTAS = :notas, 
-                      FECHA_ULTIMO_INVENTARIO = :fecha
+                  SET ID_LIBRO = :idLibro, CANTIDAD_STOCK = :cantidad, NOTAS = :notas, FECHA_ULTIMO_INVENTARIO = :fecha
                   WHERE ID_INVENTARIO = :id";
-        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':idLibro', $idLibro, PDO::PARAM_INT);
         $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
         $stmt->bindParam(':notas', $notas);
         $stmt->bindParam(':fecha', $fecha);
-        
         return $stmt->execute();
     }
 
-    // Eliminar registro del inventario
     public function eliminarInventario($id)
     {
         $query = "DELETE FROM INVENTARIO WHERE ID_INVENTARIO = :id";
