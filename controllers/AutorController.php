@@ -3,13 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../models/AutorModel.php';
+require_once '../models/AutorModel.php'; 
 
 class AutorController {
     private $modelo;
 
     public function __construct() {
-        $this->modelo = new AutorModel();
+        $this->modelo = new AutorModel(); 
     }
 
     // Acción para listar autores
