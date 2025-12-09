@@ -1,24 +1,24 @@
 <?php
 require_once '../config/database.php';
 
-class AuthorModel {
+class AutorModel {
     private $db;
 
     public function __construct() {
-        $this->db = conectarDB(); // Llama a la función de conexión a la base de datos
+        $this->db = conectarDB(); 
     }
 
     // Obtener todos los autores
-    public function getAllAuthors() {
-        $query = "SELECT * FROM author ORDER BY FULL_NAME ASC";
+    public function obtenerAutores() {
+        $query = "SELECT * FROM AUTOR ORDER BY NOMBRE_COMPLETO ASC";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Obtener un autor por su ID
-    public function getAuthorById($id) {
-        $query = "SELECT * FROM author WHERE ID_AUTHOR = :id";
+    public function obtenerAutorPorId($id) {
+        $query = "SELECT * FROM AUTOR WHERE ID_AUTOR = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -26,32 +26,36 @@ class AuthorModel {
     }
 
     // Agregar un nuevo autor
-    public function addAuthor($fullName, $birthDate, $deathDate = null) {
-        $query = "INSERT INTO author (FULL_NAME, DATE_OF_BIRTH, DATE_OF_DEATH) 
-                  VALUES (:fullName, :birthDate, :deathDate)";
+    public function agregarAutor($nombreCompleto, $fechaNacimiento, $fechaFallecimiento = null) {
+        $query = "INSERT INTO AUTOR (NOMBRE_COMPLETO, FECHA_NACIMIENTO, FECHA_FALLECIMIENTO) 
+                  VALUES (:nombre, :nacimiento, :fallecimiento)";
+        
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':fullName', $fullName);
-        $stmt->bindParam(':birthDate', $birthDate);
-        $stmt->bindParam(':deathDate', $deathDate);
+        $stmt->bindParam(':nombre', $nombreCompleto);
+        $stmt->bindParam(':nacimiento', $fechaNacimiento);
+        $stmt->bindParam(':fallecimiento', $fechaFallecimiento);
+        
         return $stmt->execute();
     }
 
-    // Actualizar un autor existente
-    public function updateAuthor($id, $fullName, $birthDate, $deathDate = null) {
-        $query = "UPDATE author 
-                  SET FULL_NAME = :fullName, DATE_OF_BIRTH = :birthDate, DATE_OF_DEATH = :deathDate 
-                  WHERE ID_AUTHOR = :id";
+    public function actualizarAutor($id, $nombreCompleto, $fechaNacimiento, $fechaFallecimiento = null) {
+        $query = "UPDATE AUTOR 
+                  SET NOMBRE_COMPLETO = :nombre, 
+                      FECHA_NACIMIENTO = :nacimiento, 
+                      FECHA_FALLECIMIENTO = :fallecimiento 
+                  WHERE ID_AUTOR = :id";
+        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':fullName', $fullName);
-        $stmt->bindParam(':birthDate', $birthDate);
-        $stmt->bindParam(':deathDate', $deathDate);
+        $stmt->bindParam(':nombre', $nombreCompleto);
+        $stmt->bindParam(':nacimiento', $fechaNacimiento);
+        $stmt->bindParam(':fallecimiento', $fechaFallecimiento);
+        
         return $stmt->execute();
     }
 
-    // Eliminar un autor por su ID
-    public function deleteAuthor($id) {
-        $query = "DELETE FROM author WHERE ID_AUTHOR = :id";
+    public function eliminarAutor($id) {
+        $query = "DELETE FROM AUTOR WHERE ID_AUTOR = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
