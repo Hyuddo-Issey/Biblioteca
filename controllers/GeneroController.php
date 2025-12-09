@@ -1,6 +1,8 @@
 <?php
 require_once '../models/GeneroModel.php';
 
+require_once '../models/GeneroModel.php';
+
 class GeneroController {
     private $modelo;
 
