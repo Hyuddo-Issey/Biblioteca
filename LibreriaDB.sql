@@ -1,0 +1,77 @@
+USE master;
+GO
+
+IF EXISTS (SELECT * FROM sys.databases WHERE name = 'LibreriaDB')
+BEGIN
+    DROP DATABASE LibreriaDB;
+END
+GO
+
+CREATE DATABASE LibreriaDB;
+GO
+
+USE LibreriaDB;
+GO
+
+CREATE TABLE GENERO (
+    ID_GENERO INT PRIMARY KEY IDENTITY(1,1),
+    NOMBRE VARCHAR(100) NOT NULL
+);
+GO
+
+CREATE TABLE AUTOR (
+    ID_AUTOR INT PRIMARY KEY IDENTITY(1,1),
+    NOMBRE_COMPLETO VARCHAR(255) NOT NULL,
+    FECHA_NACIMIENTO DATE NULL,
+    FECHA_FALLECIMIENTO DATE NULL
+);
+GO
+
+CREATE TABLE LIBRO (
+    ID_LIBRO INT PRIMARY KEY IDENTITY(1,1),
+    TITULO VARCHAR(255) NOT NULL,
+    DESCRIPCION VARCHAR(500) NULL,
+    ANIO_PUBLICACION SMALLINT NULL,
+    ID_AUTOR INT NULL,
+    ID_GENERO INT NULL,
+    CONSTRAINT FK_LIBRO_AUTOR FOREIGN KEY (ID_AUTOR) REFERENCES AUTOR(ID_AUTOR),
+    CONSTRAINT FK_LIBRO_GENERO FOREIGN KEY (ID_GENERO) REFERENCES GENERO(ID_GENERO)
+);
+GO
+
+CREATE TABLE INVENTARIO (
+    ID_INVENTARIO INT PRIMARY KEY IDENTITY(1,1),
+    ID_LIBRO INT NULL,
+    CANTIDAD_STOCK INT NOT NULL DEFAULT 0,
+    NOTAS VARCHAR(255) NULL,
+    FECHA_ULTIMO_INVENTARIO DATE DEFAULT GETDATE(),
+    CONSTRAINT FK_INVENTARIO_LIBRO FOREIGN KEY (ID_LIBRO) REFERENCES LIBRO(ID_LIBRO)
+);
+GO
+
+INSERT INTO GENERO (NOMBRE) VALUES 
+('Ficción'), ('Ciencia Ficción'), ('Misterio'), ('Fantasía'), ('No Ficción');
+
+INSERT INTO AUTOR (NOMBRE_COMPLETO, FECHA_NACIMIENTO, FECHA_FALLECIMIENTO) VALUES
+('Gabriel García Márquez', '1927-03-06', '2014-04-17'),
+('Leo Tolstoy', '1828-09-09', '1910-11-20'),
+('George Orwell', '1903-06-25', '1950-01-21'),
+('Haruki Murakami', '1949-01-12', NULL),
+('Isabel Allende', '1942-08-02', NULL);
+
+INSERT INTO LIBRO (TITULO, DESCRIPCION, ANIO_PUBLICACION, ID_AUTOR, ID_GENERO) VALUES
+('Cien años de soledad', 'Una novela sobre la familia Buendía en Macondo.', 1967, 1, 1),
+('Guerra y Paz', 'Épica sobre la invasión napoleónica a Rusia.', 1869, 2, 5),
+('1984', 'Crítica a los regímenes totalitarios.', 1949, 3, 3),
+('Kafka en la orilla', 'Un joven busca su destino.', 2002, 4, 4),
+('La casa de los espíritus', 'Saga familiar con realismo mágico.', 1982, 5, 1);
+
+INSERT INTO INVENTARIO (ID_LIBRO, CANTIDAD_STOCK, NOTAS) VALUES
+(1, 30, 'En buen estado'),
+(2, 50, 'Exitoso en ventas'),
+(3, 20, 'Requiere reposición'),
+(4, 15, 'Poco solicitado'),
+(5, 25, 'Reedición reciente');
+GO
+
+PRINT 'Base de datos LibreriaDB creada y cargada exitosamente.';
