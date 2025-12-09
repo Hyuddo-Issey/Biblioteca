@@ -1,76 +1,89 @@
 <?php
 require_once '../config/database.php';
 
-class StockModel
+class InventarioModel
 {
     private $db;
 
     public function __construct()
     {
-        $this->db = conectarDB(); // Llama a la función de conexión a la base de datos
+        $this->db = conectarDB();
     }
 
-    public function getAllStock()
+    // Obtener todo el inventario con el título del libro asociado
+    public function obtenerInventario()
     {
         $query = "
             SELECT 
-                s.ID_STOCK, 
-                s.ID_BOOK, 
-                s.TOTAL_STOCK, 
-                s.NOTES, 
-                s.LAST_INVENTORY_DATE, 
-                b.TITLE AS BOOK_TITLE
-            FROM stock s
-            LEFT JOIN book b ON s.ID_BOOK = b.ID_BOOK
+                i.ID_INVENTARIO, 
+                i.ID_LIBRO, 
+                i.CANTIDAD_STOCK, 
+                i.NOTAS, 
+                i.FECHA_ULTIMO_INVENTARIO, 
+                l.TITULO AS TITULO_LIBRO
+            FROM INVENTARIO i
+            LEFT JOIN LIBRO l ON i.ID_LIBRO = l.ID_LIBRO
+            ORDER BY l.TITULO ASC
         ";
         $stmt = $this->db->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Obtener un registro de stock por su ID
-    public function getStockById($id)
+    public function obtenerInventarioPorId($id)
     {
-        $query = "SELECT * FROM stock WHERE ID_STOCK = :id";
+        $query = "SELECT * FROM INVENTARIO WHERE ID_INVENTARIO = :id";
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Asocia el parámetro id
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC); // Devuelve un solo registro de stock
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Agregar un nuevo registro de stock
-    public function addStock($idBook, $totalStock, $notes, $lastInventoryDate)
+    // Agregar nuevo stock
+    public function agregarInventario($idLibro, $cantidad, $notas, $fecha = null)
     {
-        $query = "INSERT INTO stock (ID_BOOK, TOTAL_STOCK, NOTES, LAST_INVENTORY_DATE) 
-                  VALUES (:idBook, :totalStock, :notes, :lastInventoryDate)";
+        if ($fecha === null) {
+            $fecha = date('Y-m-d'); 
+        }
+
+        $query = "INSERT INTO INVENTARIO (ID_LIBRO, CANTIDAD_STOCK, NOTAS, FECHA_ULTIMO_INVENTARIO) 
+                  VALUES (:idLibro, :cantidad, :notas, :fecha)";
+        
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':idBook', $idBook, PDO::PARAM_INT);
-        $stmt->bindParam(':totalStock', $totalStock, PDO::PARAM_INT);
-        $stmt->bindParam(':notes', $notes);
-        $stmt->bindParam(':lastInventoryDate', $lastInventoryDate);
-        return $stmt->execute(); // Ejecuta la inserción
+        $stmt->bindParam(':idLibro', $idLibro, PDO::PARAM_INT);
+        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+        $stmt->bindParam(':notas', $notas);
+        $stmt->bindParam(':fecha', $fecha);
+        
+        return $stmt->execute();
     }
 
-    // Actualizar un registro de stock existente
-    public function updateStock($id, $idBook, $totalStock, $notes, $lastInventoryDate)
+    // Actualizar stock existente
+    public function actualizarInventario($id, $idLibro, $cantidad, $notas, $fecha)
     {
-        $query = "UPDATE stock 
-                  SET ID_BOOK = :idBook, TOTAL_STOCK = :totalStock, NOTES = :notes, LAST_INVENTORY_DATE = :lastInventoryDate
-                  WHERE ID_STOCK = :id";
+        $query = "UPDATE INVENTARIO 
+                  SET ID_LIBRO = :idLibro, 
+                      CANTIDAD_STOCK = :cantidad, 
+                      NOTAS = :notas, 
+                      FECHA_ULTIMO_INVENTARIO = :fecha
+                  WHERE ID_INVENTARIO = :id";
+        
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Asocia el parámetro id
-        $stmt->bindParam(':idBook', $idBook, PDO::PARAM_INT);
-        $stmt->bindParam(':totalStock', $totalStock, PDO::PARAM_INT);
-        $stmt->bindParam(':notes', $notes);
-        $stmt->bindParam(':lastInventoryDate', $lastInventoryDate);
-        return $stmt->execute(); // Ejecuta la actualización
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':idLibro', $idLibro, PDO::PARAM_INT);
+        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+        $stmt->bindParam(':notas', $notas);
+        $stmt->bindParam(':fecha', $fecha);
+        
+        return $stmt->execute();
     }
 
-    // Eliminar un registro de stock por su ID
-    public function deleteStock($id)
+    // Eliminar registro del inventario
+    public function eliminarInventario($id)
     {
-        $query = "DELETE FROM stock WHERE ID_STOCK = :id";
+        $query = "DELETE FROM INVENTARIO WHERE ID_INVENTARIO = :id";
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Asocia el parámetro id
-        return $stmt->execute(); // Ejecuta la eliminación
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }
+?>
