@@ -1,5 +1,9 @@
 RewriteEngine On
 RewriteBase /proyecto_mvc/public/
+
+# No reescribir si es un archivo (imágenes, css, js) o directorio real
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?controller=$1 [QSA,L]
+
+# Mandar TODO lo que se escriba en la URL a la variable 'url'
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

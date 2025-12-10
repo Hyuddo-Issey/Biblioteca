@@ -1,47 +1,32 @@
 <?php
-// index.php
-
-// 1. Configuración Inicial
-// Es buena práctica definir rutas base si el proyecto crece, pero por ahora usamos relativas.
 require_once '../config/database.php';
 
-// 2. Mapeo de Controladores (Routing)
-// IMPORTANTE: Aquí actualizamos los nombres para que coincidan con tus archivos en español.
-// Clave (URL) => Valor (Nombre de la Clase)
 $controladores = [
     'home'       => 'HomeController',
     'autor'      => 'AutorController',
     'genero'     => 'GeneroController',
     'libro'      => 'LibroController',
-    'inventario' => 'InventarioController' // Antes era 'stock', ahora apunta al nuevo
+    'inventario' => 'InventarioController'
 ];
 
-// 3. Obtener Controlador y Acción desde la URL
-// Si no existe $_GET['controller'], usamos 'home'.
 $nombreControladorURL = isset($_GET['controller']) ? strtolower($_GET['controller']) : 'home';
 $accion = isset($_GET['action']) ? $_GET['action'] : 'index';
 
-// 4. Validación del Controlador
 if (array_key_exists($nombreControladorURL, $controladores)) {
     $nombreClase = $controladores[$nombreControladorURL];
 } else {
-    // Si escriben algo raro en la URL, los mandamos al Home o a una página de error 404
     $nombreClase = 'HomeController';
     $nombreControladorURL = 'home'; 
 }
 
-// 5. Carga del Archivo del Controlador
 $archivoControlador = "../controllers/{$nombreClase}.php";
 
 if (file_exists($archivoControlador)) {
     require_once $archivoControlador;
 
-    // Instanciar la clase (Ej. new AutorController())
     $controlador = new $nombreClase();
 
-    // 6. Ejecutar la Acción
     if (method_exists($controlador, $accion)) {
-        // Buffer de salida: Capturamos el HTML que genera el controlador para inyectarlo en la plantilla
         ob_start();
         $controlador->$accion();
         $contenidoPrincipal = ob_get_clean();
@@ -61,48 +46,12 @@ if (file_exists($archivoControlador)) {
     <title>Gestión de Biblioteca</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* Estilos personalizados simples */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa; /* Gris muy suave de fondo */
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Para que el footer se quede abajo */
-        }
-        .navbar {
-            background-color: #ffffff; /* Blanco puro */
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #0d6efd !important; /* Azul Bootstrap */
-        }
-        .nav-link.active {
-            color: #0d6efd !important;
-            font-weight: 500;
-            border-bottom: 2px solid #0d6efd;
-        }
-        .main-container {
-            flex: 1; /* Empuja el footer hacia abajo */
-            padding-bottom: 2rem;
-        }
-        .footer {
-            background-color: #343a40;
-            color: #adb5bd;
-            padding: 1.5rem 0;
-            margin-top: auto;
-        }
-        .card {
-            border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra suave */
-        }
-    </style>
+    <link rel="stylesheet" href="css/navbar.css">
+
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 
 <body>

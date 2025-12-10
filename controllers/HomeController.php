@@ -1,5 +1,4 @@
 <?php
-// Asegúrate de que la ruta a database.php sea correcta según tu estructura de carpetas
 require_once '../config/database.php';
 
 class HomeController {

@@ -1,46 +1,94 @@
-/* Fondo transparente y sombra sutil */
 .navbar {
-    background-color: transparent !important;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1) !important;
-    padding: 0.75rem 1rem !important;  /* Un poco más pequeño para un efecto más minimalista */
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
 }
 
-/* Color de la marca (Biblioteca) */
 .navbar-brand {
-    font-weight: bold;
-    font-size: 1.7rem;
-    color: #333;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    letter-spacing: -0.5px;
+}
+
+.navbar-brand i {
+    color: #0d6efd;
+}
+
+.navbar-nav .nav-link {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #555;
+    margin: 0 0.5rem;
+    position: relative;
     transition: color 0.3s ease;
 }
 
-/* Cambio de color en hover de la marca */
-.navbar-brand:hover {
-    color: #007bff;
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #0d6efd;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
 }
 
-/* Estilo de los enlaces de navegación */
-.navbar-nav .nav-link {
-    font-size: 1rem;
-    color: #555;
-    margin: 0 0.75rem;
-    transition: color 0.3s ease, transform 0.2s ease;
-}
-
-/* Efecto al pasar el ratón sobre los enlaces */
 .navbar-nav .nav-link:hover {
-    color: #007bff;
-    text-decoration: none;
-    transform: translateY(-2px);
+    color: #0d6efd;
 }
 
-/* Botón de menú hamburguesa */
-.navbar-toggler-icon {
-    background-color: #007bff;
+.navbar-nav .nav-link:hover::after {
+    width: 100%;
 }
 
-/* Ajustar la visibilidad de la barra en pantallas pequeñas */
-@media (max-width: 767px) {
+.navbar-nav .nav-link.active {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.navbar-nav .nav-link.active::after {
+    width: 100%;
+}
+
+.navbar-toggler {
+    border: none;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+    box-shadow: none !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+@media (max-width: 991px) {
     .navbar-collapse {
-        background-color: rgba(255, 255, 255, 0.95); /* Fondo semi-transparente para los menús */
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+    }
+
+    .navbar-nav .nav-link::after {
+        display: none;
+    }
+
+    .navbar-nav .nav-link:hover {
+        transform: translateX(5px);
+    }
+    
+    .navbar-nav .nav-link.active {
+        background-color: #f0f7ff;
+        border-radius: 5px;
+        padding-left: 10px;
     }
 }
